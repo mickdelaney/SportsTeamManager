@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>f u t b o l</title>
+<style>
+.onoffswitch-checkbox {
+  width: 30px;
+}
+.player-name {
+  width: 150px;
+}
+</style>
+<script src="http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.js"></script>
+<script type="text/javascript">
+function FutbolView() {
+  function displayGameInfo(game) {
+    var p, container, span, a;
+    container = document.getElementById("game-info");
+    p = document.createElement("p");
+    p.innerText = game.title;
+    container.appendChild(p);
+    p = document.createElement("p");
+    span = document.createElement("span");
+    span.innerText = "@ " + game.location + " ";
+    a = document.createElement("a");
+    a.href = game.map;
+    a.target = "_blank";
+    a.textContent = "map";
+    p.appendChild(span);
+    p.appendChild(a);
+    container.appendChild(p);
+    p = document.createElement("p");
+    p.innerText = "on " + game.when;
+    container.appendChild(p);
+    p = document.createElement("p");
+    p.innerText = (game.players?game.players:0) + " of " + game.size;
+    container.appendChild(p);
+  }
+  function displayGameMembers(game) {
+    var p, container, span, a;
+    container = document.getElementById("game-members");
+    game.members.forEach(function(m) {
+      div = document.createElement("div");
+      span = document.createElement("span");
+      span.className = "player-name";
+      span.innerText = m.name;
+      div.appendChild(span);
+
+      input = document.createElement("input");
+      input.type = "checkbox";
+      input.className = "onoffswitch-checkbox";
+      input.id = "mpp" + m.id;
+      input.checked = m.prepay;
+      div.appendChild(input);
+
+      input = document.createElement("input");
+      input.type = "checkbox";
+      input.className = "onoffswitch-checkbox";
+      input.id = "mpp" + m.id;
+      input.checked = m.admin;
+      div.appendChild(input);
+
+      input = document.createElement("input");
+      input.type = "checkbox";
+      input.className = "onoffswitch-checkbox";
+      input.id = "mpp" + m.id;
+      input.checked = m.invited;
+      div.appendChild(input);
+
+      input = document.createElement("input");
+      input.type = "checkbox";
+      input.className = "onoffswitch-checkbox";
+      input.id = "mpp" + m.id;
+      input.checked = m.reminder;
+      div.appendChild(input);
+
+      input = document.createElement("input");
+      input.type = "checkbox";
+      input.className = "onoffswitch-checkbox";
+      input.id = "mpp" + m.id;
+      input.checked = m.accepted;
+      div.appendChild(input);
+
+      input = document.createElement("input");
+      input.type = "checkbox";
+      input.className = "onoffswitch-checkbox";
+      input.id = "mpp" + m.id;
+      input.checked = m.rejected;
+      div.appendChild(input);
+
+      input = document.createElement("input");
+      input.type = "checkbox";
+      input.className = "onoffswitch-checkbox";
+      input.id = "mpp" + m.id;
+      input.checked = m.picked;
+      div.appendChild(input);
+
+      input = document.createElement("input");
+      input.type = "checkbox";
+      input.className = "onoffswitch-checkbox";
+      input.id = "mpp" + m.id;
+      input.checked = m.loyalty;
+      div.appendChild(input);
+
+      container.appendChild(div);
+    });
+  }
+  function displayGame(game) {
+    displayGameInfo(game);
+    displayGameMembers(game);
+  };
+  this.displayGame = displayGame;
+  this.displayGameInfo = displayGameInfo;
+  this.displayGameMembers = displayGameMembers;
+}
+function FutbolAPI(config) {
+  this.getGame = function(gid, cb) {
+    $.ajax({
+      url: config.base + "game/" + gid,
+      type: "GET",
+      contentType: "application/json",
+      accepts: "application/json",
+      cache: false,
+      error: function(jqXHR) {
+        cb(new Error("ajax error " + jqXHR.status));
+      }
+    }).done(function(data) {
+      cb(null, data[0]);
+    });
+  };
+}
+</script>
+<script type="text/javascript">
+var API;
+var VIEW;
+function init() {
+  API = new FutbolAPI({
+    base: "http://icms.owner.net/"
+  });
+  VIEW = new FutbolView();
+  API.getGame("00000001", function(err, game) {
+    if(err) return console.error(err);
+    VIEW.displayGame(game);
+  });
+}
+</script>
+</head>
+<body onload="init()">
+<div id="game-info"></div>
+<div id="game-members"></div>
+</body>
+</html>

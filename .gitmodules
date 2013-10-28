@@ -1,0 +1,3 @@
+[submodule "lib/minode"]
+	path = lib/minode
+	url = git@github.com:billywhizz/minode.git
