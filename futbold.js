@@ -2,6 +2,7 @@ var minode = require("./lib/minode");
 var nodemailer = require("nodemailer");
 var parseURL = minode.utils.parseURL;
 var HTTPServer = minode.http.Server;
+var fs = require("fs");
 var config = {
   httpd: {
     host: "0.0.0.0",
@@ -183,7 +184,15 @@ db.games.forEach(function(g) {
 //repl.start("> ").context.db = db;
 var rc;
 var httpd;
-var index = require("fs").readFileSync("./index.html");
+var index;
+fs.watchFile("./index.html", function (curr, prev) {
+  if(Date.parse(curr.mtime) != Date.parse(prev.mtime)) {
+    console.log("file changed");
+    index = fs.readFileSync("./index.html");
+    index = [new Buffer("HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: " + index.length + "\r\n\r\n"), index];
+  }
+});
+index = fs.readFileSync("./index.html");
 index = [new Buffer("HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: " + index.length + "\r\n\r\n"), index];
 function httpHandler(peer) {
   peer.onRequest = function(request) {
@@ -192,11 +201,10 @@ function httpHandler(peer) {
     var parts = request.url.pathname.split("/");
     var game = {};
     switch(parts[1]) {
-      case "":
-        break;
       case "favicon.ico":
-        return true;
+        return false;
         break;
+      case "":
       case "index.html":
         var r = peer.send(index, function(status, handle, req) {
           if(status !== 0) {
