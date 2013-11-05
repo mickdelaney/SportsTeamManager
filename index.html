@@ -140,7 +140,7 @@ var API;
 var VIEW;
 function init() {
   API = new FutbolAPI({
-    base: "http://icms.owner.net/"
+    base: "/"
   });
   VIEW = new FutbolView();
   API.getGame("00000001", function(err, game) {
